@@ -4,7 +4,7 @@ public class Project extends Input {
     private String[] tasks;
     private int taskCount;
     private int maxTasks;
-    
+
     // Default constructor
     public Project() {
         super(); // Call parent constructor
@@ -13,7 +13,7 @@ public class Project extends Input {
         this.tasks = new String[maxTasks];
         this.taskCount = 0;
     }
-    
+
     // Parameterized constructor
     public Project(String name, String location, String details, int time, DateC date,
                    DateC dateAdded) {
@@ -23,17 +23,17 @@ public class Project extends Input {
         this.tasks = new String[maxTasks];
         this.taskCount = 0;
     }
-    
+
     // Getter for dateAdded
     public DateC getDateAdded() {
         return dateAdded;
     }
-    
+
     // Setter for dateAdded
     public void setDateAdded(DateC dateAdded) {
         this.dateAdded = dateAdded;
     }
-    
+
     // Method to add a task
     public boolean addTask(String task) {
         if (taskCount < maxTasks) {
@@ -48,7 +48,7 @@ public class Project extends Input {
             return true;
         }
     }
-    
+
     // Method to remove a task by index
     public boolean removeTask(int index) {
         if (index >= 0 && index < taskCount) {
@@ -62,19 +62,19 @@ public class Project extends Input {
         }
         return false;
     }
-    
+
     // Method to get all tasks
     public String[] getTasks() {
         String[] result = new String[taskCount];
         System.arraycopy(tasks, 0, result, 0, taskCount);
         return result;
     }
-    
+
     // Method to get task count
     public int getTaskCount() {
         return taskCount;
     }
-    
+
     // Method to get a specific task
     public String getTask(int index) {
         if (index >= 0 && index < taskCount) {
@@ -82,7 +82,7 @@ public class Project extends Input {
         }
         return null;
     }
-    
+
     // Private method to expand tasks array when needed
     private void expandTasksArray() {
         maxTasks = maxTasks * 2;
@@ -90,7 +90,7 @@ public class Project extends Input {
         System.arraycopy(tasks, 0, newTasks, 0, tasks.length);
         tasks = newTasks;
     }
-    
+
     // Method to clear all tasks
     public void clearTasks() {
         for (int i = 0; i < taskCount; i++) {
@@ -98,7 +98,7 @@ public class Project extends Input {
         }
         taskCount = 0;
     }
-    
+
     // Override toString to include project-specific information
     @Override
     public String toString() {
@@ -109,20 +109,20 @@ public class Project extends Input {
                 taskList.append(", ");
             }
         }
-        
-        return super.toString() + 
+
+        return super.toString() +
                 ", Project{" +
                 "dateAdded=" + dateAdded +
                 ", tasks=[" + taskList.toString() + "]" +
                 ", taskCount=" + taskCount +
                 '}';
     }
-    
+
     // Method to check if project has tasks
     public boolean hasTasks() {
         return taskCount > 0;
     }
-    
+
     // Method to check if tasks array is full
     public boolean isTasksFull() {
         return taskCount >= maxTasks;

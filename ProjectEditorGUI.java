@@ -1,9 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class ProjectCreatorGUI extends JFrame {
+public class ProjectEditorGUI extends JFrame {
 
     private ProjectManagerGUI managerGUI; // Reference to main GUI
+    private Project project;               // Project being edited
 
     // Form fields
     private JTextField nameField;
@@ -11,17 +12,18 @@ public class ProjectCreatorGUI extends JFrame {
     private JTextArea detailsArea;
     private JButton saveButton, backButton;
 
-    public ProjectCreatorGUI(ProjectManagerGUI managerGUI) {
+    public ProjectEditorGUI(ProjectManagerGUI managerGUI, Project project) {
         this.managerGUI = managerGUI;
+        this.project = project;
 
-        setTitle("Create Project");
+        setTitle("Edit Project");
         setSize(500, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // ===== Title =====
-        JLabel titleLabel = new JLabel("Create Project", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Edit Project", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(titleLabel, BorderLayout.NORTH);
@@ -37,11 +39,13 @@ public class ProjectCreatorGUI extends JFrame {
 
         // Project Name
         c.gridx = 0; c.gridy = row; formPanel.add(new JLabel("Project Name:"), c);
-        nameField = new JTextField(); c.gridx = 1; formPanel.add(nameField, c); row++;
+        nameField = new JTextField(project.getName());
+        c.gridx = 1; formPanel.add(nameField, c); row++;
 
         // Details
         c.gridx = 0; c.gridy = row; formPanel.add(new JLabel("Details:"), c);
         detailsArea = new JTextArea(4, 20);
+        detailsArea.setText(project.getDetails());
         detailsArea.setLineWrap(true);
         detailsArea.setWrapStyleWord(true);
         JScrollPane detailsScroll = new JScrollPane(detailsArea);
@@ -51,6 +55,12 @@ public class ProjectCreatorGUI extends JFrame {
         c.gridx = 0; c.gridy = row; formPanel.add(new JLabel("End Date (DD/MM/YYYY):"), c);
         JPanel endPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         endDay = new JTextField(2); endMonth = new JTextField(2); endYear = new JTextField(4);
+
+        // Prefill end date
+        endDay.setText(String.valueOf(project.getDateAdded().getDay()));
+        endMonth.setText(String.valueOf(project.getDateAdded().getMonth()));
+        endYear.setText(String.valueOf(project.getDateAdded().getYear()));
+
         endPanel.add(endDay); endPanel.add(new JLabel("/"));
         endPanel.add(endMonth); endPanel.add(new JLabel("/"));
         endPanel.add(endYear);
@@ -60,10 +70,10 @@ public class ProjectCreatorGUI extends JFrame {
 
         // ===== Buttons =====
         JPanel buttonPanel = new JPanel(new FlowLayout());
-        saveButton = createStyledButton("Save Project");
+        saveButton = createStyledButton("Save Changes");
         backButton = createStyledButton("Back");
 
-        saveButton.addActionListener(e -> saveProject());
+        saveButton.addActionListener(e -> saveChanges());
         backButton.addActionListener(e -> dispose());
 
         buttonPanel.add(saveButton);
@@ -73,26 +83,29 @@ public class ProjectCreatorGUI extends JFrame {
         setVisible(true);
     }
 
-    private void saveProject() {
+    private void saveChanges() {
         try {
-            String name = nameField.getText();
-            String details = detailsArea.getText();
+            // Update project fields
+            project.setName(nameField.getText());
+            project.setDetails(detailsArea.getText());
 
-            // Parse End Date
+            // Parse end date
             DateC endDate = new DateC(
                     Integer.parseInt(endDay.getText()),
                     Integer.parseInt(endMonth.getText()),
                     Integer.parseInt(endYear.getText())
             );
+            project.setDateAdded(endDate); // Assuming 'dateAdded' now represents end date
 
-            // For creation date, use current date
-            DateC creationDate = new DateC();
+            // Update dropdown in manager GUI
+            int index = managerGUI.projectDropdown.getSelectedIndex();
+            if (index >= 0) {
+                managerGUI.projectDropdown.insertItemAt(project.getName(), index);
+                managerGUI.projectDropdown.removeItemAt(index + 1);
+                managerGUI.projectDropdown.setSelectedIndex(index);
+            }
 
-            Project project = new Project(name, "", details, 0, creationDate, endDate);
-
-            if (managerGUI != null) managerGUI.addProject(project);
-
-            JOptionPane.showMessageDialog(this, "Project created:\n" + project);
+            JOptionPane.showMessageDialog(this, "Project updated!");
             dispose();
 
         } catch (NumberFormatException e) {

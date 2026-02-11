@@ -33,17 +33,54 @@ public class DeleteEventGUI extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
-        JButton DeleteButton = createStyledButton("Delete Event");
-        DeleteButton.addActionListener(e -> deleteEvent());
-        add(DeleteButton, BorderLayout.SOUTH);
-
+        JButton deleteButton = createStyledButton("Delete Event");
+        deleteButton.addActionListener(e -> deleteEvent());
+        add(deleteButton, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
-
     private void deleteEvent() {
+        // Get the selected event from the combo box
+        Event selectedEvent = (Event) eventCombo.getSelectedItem();
 
+        if (selectedEvent != null) {
+            // Confirm deletion
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to delete the event \"" + selectedEvent.getName() + "\"?",
+                    "Confirm Deletion",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Remove the event from the main event list
+                ChirpifyGUI.eventList.remove(selectedEvent);
+
+                // Update the UpcomingEventsGUI if needed
+                if (upcomingGUI != null) {
+                    upcomingGUI.refreshTable(); // Make sure this method exists in UpcomingEventsGUI
+                }
+
+                // Remove the event from the combo box
+                eventCombo.removeItem(selectedEvent);
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Event deleted successfully!",
+                        "Deleted",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No event selected.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     private JButton createStyledButton(String text) {
